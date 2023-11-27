@@ -160,13 +160,13 @@ class ResourceServer extends Emitter{
         });
 
         this._server.listen(this._port, this._host, () => {
-            console.log(clc.green(`Openblock resource server start successfully, socket listen on: http://${this._host}:${this._port}`));
+            console.log(clc.green(`Coconut resource server start successfully, socket listen on: http://${this._host}:${this._port}`));
             this.emit('ready');
         })
             .on('error', err => {
                 this.isSameServer('127.0.0.1', this._port).then(isSame => {
                     if (isSame) {
-                        console.log(`Port is already used by other openblock-resource server, will try reopening after ${REOPEN_INTERVAL} ms`); // eslint-disable-line max-len
+                        console.log(`Port is already used by other coconut-resource server, will try reopening after ${REOPEN_INTERVAL} ms`); // eslint-disable-line max-len
                         setTimeout(() => {
                             this._server.close();
                             this._server.listen(this._port, this._host);

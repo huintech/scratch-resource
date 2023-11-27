@@ -10,7 +10,7 @@ const DIRECTORY_NAME = 'external-resources';
  * The path of default user data directory.
  * @readonly
  */
-const DEFAULT_USER_DATA_PATH = path.join(__dirname, '../../.openblockData');
+const DEFAULT_USER_DATA_PATH = path.join(__dirname, '../../.coconutData');
 
 /**
  * The locale of default.
@@ -34,10 +34,10 @@ const DEFAULT_PORT = 20112;
  * Server name, ues in root path.
  * @readonly
  */
-const SERVER_NAME = 'openblock-resource-server';
+const SERVER_NAME = 'coconut-resource-server';
 
 /**
- * The time interval for retrying to open the port after the port is occupied by another openblock-resource server.
+ * The time interval for retrying to open the port after the port is occupied by another coconut-resource server.
  * @readonly
  */
 const REOPEN_INTERVAL = 1000 * 1;
