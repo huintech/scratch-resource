@@ -1,6 +1,6 @@
 {
   "name": "scratch-resource",
-  "version": "0.2.0",
+  "version": "0.8.0",
   "description": "External resources for Coconut projects",
   "main": "start.js",
   "scripts": {
@@ -15,6 +15,7 @@
     "deploy": "npm run fetch && npm run build",
     "ext:opt-size": "opt-size --dir=external-resources",
     "ext:gen-config": "gen-config --dir=external-resources --repo=huintech/external-resources-v2",
+    "ext:gen-config2": "gen-config --dir=external-resources",
     "ext:i18n-extract": "i18n-extract  --dir=external-resources",
     "ext:i18n-push": "i18n-push --dir=external-resources",
     "ext:i18n-update": "i18n-update --dir=external-resources",
