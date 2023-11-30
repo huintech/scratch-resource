@@ -17,7 +17,7 @@ const {
     RECHECK_INTERVAL
 } = require('./src/config');
 
-class OpenblockResourceServer extends Emitter{
+class ScratchResourceServer extends Emitter{
     constructor (userDataPath, initialResourcesPath, locale = DEFAULT_LOCALE) {
         super();
 
@@ -28,11 +28,19 @@ class OpenblockResourceServer extends Emitter{
         }
         this._configPath = path.join(this._userDataPath, 'config.json');
 
-        // The path that store initial resources.
         if (initialResourcesPath) {
             this._resourcesPath = path.join(initialResourcesPath);
         } else {
             this._resourcesPath = path.join(__dirname, DIRECTORY_NAME);
+        }
+
+        // If 'OpenBlockResources' exists in the upper-level directory, the content in this
+        // directory will be used first, rather than the content in the software installation path.
+        // This method is used when customizing by a third-party manufacturer, so as to avoid overwriting
+        // the content of the third - party manufacturer when updating the software.
+        const thirdPartyResourcesPath = path.join(this._resourcesPath, '../../CoconutResources');
+        if (fs.existsSync(thirdPartyResourcesPath)) {
+            this._resourcesPath = thirdPartyResourcesPath;
         }
 
         this._locale = locale;
@@ -162,4 +170,4 @@ class OpenblockResourceServer extends Emitter{
     }
 }
 
-module.exports = OpenblockResourceServer;
+module.exports = ScratchResourceServer;

@@ -39,13 +39,14 @@ class ResourceServer extends Emitter{
         this.devices = new OpenBlockDevice();
 
         this._formatMessage = {};
-        this.deviceIndexData = {};
-        this.extensionsIndexData = {};
+        this.deviceIndexData = {cmtye: {}, distro: {}};
+        this.extensionsIndexData = {cmtye: {}, distro: {}};
     }
 
-    // If the 18n cache is not exist, generate it.
-    generate18nCache (locale) {
-        if (this.deviceIndexData[`${locale}`] && this.extensionsIndexData[`${locale}`]) {
+    // If the cache is not exist, generate it.
+    generateCache (edition, locale) {
+        if (this.deviceIndexData[`${edition}`][`${locale}`] &&
+            this.extensionsIndexData[`${edition}`][`${locale}`]) {
             return;
         }
 
@@ -73,11 +74,13 @@ class ResourceServer extends Emitter{
             translations: translations
         });
 
-        this.deviceIndexData[`${locale}`] =
-                JSON.stringify(this.devices.assembleData(this._userDataPath, this._formatMessage[`${locale}`]));
+        this.deviceIndexData[`${edition}`][`${locale}`] =
+            JSON.stringify(this.devices.assembleData(this._userDataPath,
+                edition, this._formatMessage[`${locale}`]));
 
-        this.extensionsIndexData[`${locale}`] =
-                JSON.stringify(this.extensions.assembleData(this._userDataPath, this._formatMessage[`${locale}`]));
+        this.extensionsIndexData[`${edition}`][`${locale}`] =
+            JSON.stringify(this.extensions.assembleData(this._userDataPath,
+                edition, this._formatMessage[`${locale}`]));
     }
 
     isSameServer (host, port) {
@@ -125,9 +128,19 @@ class ResourceServer extends Emitter{
             res.send(SERVER_NAME);
         });
 
-        this._app.get('/:type/:locale', (req, res) => {
-
+        this._app.get('/:type/:edition/:locale', (req, res) => {
             const type = req.params.type;
+            const edition = req.params.edition;
+
+            if (type !== 'devices' && type !== 'extensions') {
+                res.sendStatus(404);
+                return;
+            }
+
+            if (edition !== 'cmtye' && edition !== 'distro') {
+                res.sendStatus(404);
+                return;
+            }
 
             let locale;
             if (req.params.locale.indexOf('.') === -1) {
@@ -136,23 +149,24 @@ class ResourceServer extends Emitter{
                 locale = req.params.locale.slice(0, req.params.locale.indexOf('.'));
             }
 
+            // Generate data cache after first access
             if (type === this.extensions.type) {
-                this.generate18nCache(locale);
-                res.send(this.extensionsIndexData[`${locale}`]);
+                this.generateCache(edition, locale);
+                res.send(this.extensionsIndexData[`${edition}`][`${locale}`]);
             } else if (type === this.devices.type) {
-                this.generate18nCache(locale);
-                res.send(this.deviceIndexData[`${locale}`]);
+                this.generateCache(edition, locale);
+                res.send(this.deviceIndexData[`${edition}`][`${locale}`]);
             }
         });
 
         this._server.listen(this._port, this._host, () => {
-            console.log(clc.green(`Openblock resource server start successfully, socket listen on: http://${this._host}:${this._port}`));
+            console.log(clc.green(`Coconut resource server start successfully, socket listen on: http://${this._host}:${this._port}`));
             this.emit('ready');
         })
             .on('error', err => {
                 this.isSameServer('127.0.0.1', this._port).then(isSame => {
                     if (isSame) {
-                        console.log(`Port is already used by other openblock-resource server, will try reopening after ${REOPEN_INTERVAL} ms`); // eslint-disable-line max-len
+                        console.log(`Port is already used by other coconut-resource server, will try reopening after ${REOPEN_INTERVAL} ms`); // eslint-disable-line max-len
                         setTimeout(() => {
                             this._server.close();
                             this._server.listen(this._port, this._host);
